@@ -93,7 +93,12 @@ def gbill():
 
 
 
+
 def show():
+    global show_window
+    show_window = Toplevel()
+    show_window.title('ALL RECORDS')
+    show_window.geometry('480x480')
     # Create a databases or connect to one
     conn = sqlite3.connect('record.db')
     # Create cursor
@@ -106,11 +111,46 @@ def show():
 
     print_record = ''
     for record in records:
-        print_record += str(record[0]) + ' ' + str(record[1]) + ' ' + '\t' + str(record[5]) + '\n'
-    Label(F2, text=print_record).grid(row=4, column=0, columnspan=2)
+        print_record += str(record[5])+')' + '  ' + str(record[0]) + '  ' + str(record[1])+'  '+\
+                        str(record[2]) + '  '+str(record[3])+ '  '+ str(record[4]) + '\n'
+    Label(show_window, text=print_record,font=('Arial Bold', 20)).place(x=10,y=10)
+    Label(show_window, text="Number: ", font= 20).place(x=10, y=350)
+    delete_entry=Entry(show_window,font=('Arial ', 10),width=35)
+    delete_entry.place(x=100,y=360)
+
+    def close():
+        show_window.destroy()
+
+    def delete():
+        conn = sqlite3.connect('record.db')
+        c = conn.cursor()
+        c.execute('DELETE from addresses WHERE oid= ' + delete_entry.get())
+        print("Deleted successfully")
+        c.execute("SELECT *, oid FROM addresses")
+
+        records = c.fetchall()
+
+        print_record = ''
+        for record in records:
+            print_record += str(record[5]) + ')' + '  ' + str(record[0]) + '  ' + str(record[1]) + '  ' + \
+                            str(record[2]) + '  ' + str(record[3]) + '  ' + str(record[4]) + '\n'
+        Label(show_window, text=print_record, font=('Arial Bold', 20)).place(x=10, y=10)
+
+        conn.commit()
+        conn.close()
+
+    Button(show_window,text="delete",font='bold',bg='black',fg="white",padx=20,pady=5,command=delete).place(x=100,y=400)
+
+    Button(show_window, text="Close", font='bold', bg='black', fg="white", padx=20, pady=5, command=close).place(x=250,y=400)
 
     conn.commit()
     conn.close()
+
+
+
+
+
+
 
 # def clear():
 #     c_name.set('')
